@@ -8,7 +8,7 @@ defmodule ChatbotFb.Application do
   @impl true
   def start(_type, _args) do
     children = [
-        {Plug.Cowboy,scheme: :http,plug: ChatbotFb.ChatRouter, options: [port: 8080]}
+        {Plug.Cowboy,scheme: :http, plug: ChatbotFb.ChatRouter, options: [ip: "chatbot-test.gigalixirapp.com",port: 443]}
     ]
     # :observer.start()
     opts = [strategy: :one_for_one, name: ChatbotFb.Supervisor]
