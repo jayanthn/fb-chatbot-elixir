@@ -9,9 +9,14 @@ defmodule ChatbotFb.Application do
   @impl true
   @spec start(any, any) :: {:error, any} | {:ok, pid}
   def start(_type, _args) do
-    {:ok,port} = Application.get_env(:chatbot_fb,:port)
+    name = Application.get_application(__MODULE__)
+    dbg(name)
+    env = Application.get_all_env(__MODULE__)
+    dbg(env)
+    # {:ok,port} = Application.get_env(:chatbot_fb,:port)
+
     children = [
-        {Plug.Cowboy,scheme: :http, plug: ChatbotFb.ChatRouter, options: [port: port]}
+        {Plug.Cowboy,scheme: :http, plug: ChatbotFb.ChatRouter, options: [port: 4000]}
     ]
 
     # :observer.start()
