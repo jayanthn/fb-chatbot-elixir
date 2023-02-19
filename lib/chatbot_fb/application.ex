@@ -5,10 +5,13 @@ defmodule ChatbotFb.Application do
 
   use Application
   require Logger
+
   @impl true
+  @spec start(any, any) :: {:error, any} | {:ok, pid}
   def start(_type, _args) do
+    {:ok,port} = Application.get_env(:chatbot_fb,:port)
     children = [
-        {Plug.Cowboy,scheme: :http, plug: ChatbotFb.ChatRouter, options: [port: 4000]}
+        {Plug.Cowboy,scheme: :http, plug: ChatbotFb.ChatRouter, options: [port: port]}
     ]
 
     # :observer.start()
