@@ -1,5 +1,6 @@
 defmodule ChatbotFb.ChatRouter do
 
+  require Logger
   @token_val "859035600"
 
   use Plug.Router
@@ -10,6 +11,7 @@ defmodule ChatbotFb.ChatRouter do
 
 
   get "/webhooks" do
+    IO.inspect("Received GET Webhooks request at : ")
     Logger.info("Received GET Webhooks request at : ")
     case validate_get_request(conn.params) do
       :ok -> send_resp(conn,200,conn.params["hub.challenge"])
