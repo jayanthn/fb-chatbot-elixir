@@ -7,10 +7,8 @@ defmodule ChatbotFb.Application do
   require Logger
   @impl true
   def start(_type, _args) do
-    {:ok,{_,_,_,_,_,[ip]}} = :inet.gethostbyname('chatbot-test.gigalixirapp.com')
-    dbg(ip)
     children = [
-        {Plug.Cowboy,scheme: :http, plug: ChatbotFb.ChatRouter, options: [ip: ip, port: 4000]}
+        {Plug.Cowboy,scheme: :http, plug: ChatbotFb.ChatRouter, options: [port: 4000]}
     ]
 
     # :observer.start()
