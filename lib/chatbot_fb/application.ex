@@ -10,7 +10,7 @@ defmodule ChatbotFb.Application do
     {:ok,{_,_,_,_,_,[ip]}} = :inet.gethostbyname('chatbot-test.gigalixirapp.com')
     dbg(ip)
     children = [
-        {Plug.Cowboy,scheme: :http, plug: ChatbotFb.ChatRouter, options: [ip: ip, port: 443]}
+        {Plug.Cowboy,scheme: :http, plug: ChatbotFb.ChatRouter, options: [ip: ip, port: 4000]}
     ]
 
     # :observer.start()
