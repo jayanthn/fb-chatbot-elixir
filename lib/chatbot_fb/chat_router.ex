@@ -10,6 +10,7 @@ defmodule ChatbotFb.ChatRouter do
 
 
   get "/webhooks" do
+    Logger.info("Received GET Webhooks request at : ")
     case validate_get_request(conn.params) do
       :ok -> send_resp(conn,200,conn.params["hub.challenge"])
       :error -> send_resp(conn,403,"error")
