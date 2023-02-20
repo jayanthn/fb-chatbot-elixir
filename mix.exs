@@ -23,8 +23,11 @@ defmodule ChatbotFb.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:plug_cowboy, "~> 2.6.0"},
       {:poison, "~> 5.0"},
+      {:plug_cowboy, "~> 2.6.0"},
+      {:jason, "~> 1.4"},
+      {:httpoison, "~> 2.0"}
+
     ]
   end
 end
