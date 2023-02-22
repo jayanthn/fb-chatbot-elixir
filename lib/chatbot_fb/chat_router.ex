@@ -1,5 +1,4 @@
 defmodule ChatbotFb.ChatRouter do
-alias ChatbotFb.ChatSession
 
   require Logger
   @token_val "859035600"
@@ -20,11 +19,16 @@ alias ChatbotFb.ChatSession
 
   post "/webhooks" do
     IO.inspect(conn)
-    if conn.body_params["object"] == "page" do
+    fieldname = conn.body_params["field"]
+    cond do
+      fieldname == "messages" ->
         send_resp(conn,200,"OK")
-        process_message(conn.body_params["messaging"])
-    else
-      send_resp(conn,200,"")
+        process_message(conn.body_params)
+      fieldname == "messaging_postback" ->
+        send_resp(conn,200,"OK")
+        process_postback(conn.body_params)
+      true ->
+        send_resp(conn,404,"")
     end
     conn
   end
@@ -33,29 +37,60 @@ alias ChatbotFb.ChatSession
     send_resp(conn,200,"ERROR")
   end
 
+
   defp validate_get_request(req_params) do
-    dbg(req_params)
+    # dbg(req_params)
     case {req_params["hub.mode"],req_params["hub.verify_token"]} do
       {"subscribe",@token_val} -> :ok
       _ -> :error
     end
   end
 
-  defp process_message([]) do end
-  defp process_message([message|messages]) do
-    sender = message["sender"]
-    id = sender["id"]
-    case process_user(id,message) do
-      {:ok,pid} ->
-        ChatSession.add_session(id,pid)
-      _ -> :ok
-      end
-      process_message(messages)
-end
+  defp process_postback(message) do
+    value_struct = message["value"]
+    sender_struct = value_struct["sender"]
+    sender = sender_struct["id"]
+    try do
+      postback_struct = message["postback"]
+      actualmessage = postback_struct["payload"]
+      process_user(sender,actualmessage)
+    rescue
+      error in RuntimeError ->
+        ChatSession.send_response(sender,"Unable to process request. Please try again")
+        Logger.error("Invalid message from #{sender}...#{error}")
+    end
+  end
+
+  defp process_message(message) do
+    sender =
+    try do
+      value_struct = message["value"]
+      sender_struct = value_struct["sender"]
+      sender_struct["id"]
+    rescue
+      error in RuntimeError ->
+        Logger.error("Invalid message, cannot reply since user id can't be obtained...#{error}")
+    end
+    try do
+      message = message["message"]
+      actualmessage = message["text"]
+      process_user(sender,actualmessage)
+    rescue
+      error in RuntimeError ->
+        ChatSession.send_response(sender,"Unable to process request. Please try again")
+        Logger.error("Invalid message from #{sender}...#{error}")
+    end
+  end
+
   defp process_user(id,message) do
     case ChatSession.get_session(id) do
       nil -> ChatSession.assign_session(id)
-      _ -> ChatSession.handle_message(id,message)
+      pid ->
+        if Process.alive?(pid) do
+          ChatSession.process_user_message(pid,{:message,message})
+        else
+          ChatSession.assign_session(id)
+        end
     end
   end
 
