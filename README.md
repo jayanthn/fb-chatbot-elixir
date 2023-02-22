@@ -1,6 +1,6 @@
 # ChatbotFb
 
-**TODO: Add description**
+Small chatbot on Facebook which provides information on Crypto Currencies
 
 ## Installation
 
